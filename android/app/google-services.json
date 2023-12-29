@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "757993777292",
+    "project_id": "skincaretracker-40127",
+    "storage_bucket": "skincaretracker-40127.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:757993777292:android:8e3716051ff7a0f38bf3a9",
+        "android_client_info": {
+          "package_name": "com.agerestore.us"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIj9KWH9BpHaAh0SG4XMPrDGXu5JVIyYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
