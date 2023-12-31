@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:skin_care_traker/utilitys/app_color.dart';
+import 'package:skin_care_traker/view/app_bottom_menu/app_bottom_menu.dart';
 
 class AppTopBar extends StatelessWidget {
   const AppTopBar({
@@ -24,14 +26,17 @@ class AppTopBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-                color: AppColor.mainColor,
-                borderRadius: BorderRadius.circular(100)
+          InkWell(
+            onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>AppBottomMenu(pageIndex: 3,))),
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                  color: AppColor.mainColor,
+                  borderRadius: BorderRadius.circular(100)
+              ),
+              child: Center(child: Icon(Icons.person, color: Colors.white, size: 30,),),
             ),
-            child: Center(child: Icon(Icons.person, color: Colors.white, size: 30,),),
           ),
           Container(
             width: 180,
@@ -45,7 +50,7 @@ class AppTopBar extends StatelessWidget {
                 color: AppColor.bg,
                 borderRadius: BorderRadius.circular(100)
             ),
-            child: Center(child: Icon(Icons.check, color: AppColor.mainColor,),),
+           // child: Center( child: Icon(Icons.check, color: AppColor.mainColor,),),
           ),
 
         ],

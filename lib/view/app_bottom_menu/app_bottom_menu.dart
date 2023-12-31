@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:skin_care_traker/utilitys/app_color.dart';
 import 'package:skin_care_traker/view/home/home.dart';
 import 'package:skin_care_traker/view/profile/profile.dart';
+import 'package:skin_care_traker/view/shop/shop.dart';
+import 'package:skin_care_traker/view/support/support.dart';
 
 
 class AppBottomMenu extends StatefulWidget {
-  const AppBottomMenu({Key? key}) : super(key: key);
+  final int pageIndex;
+  const AppBottomMenu({Key? key, this.pageIndex = 0}) : super(key: key);
 
   @override
   State<AppBottomMenu> createState() => _AppBottomMenuState();
@@ -15,10 +18,17 @@ class _AppBottomMenuState extends State<AppBottomMenu> {
   int _currentIndex = 0;
   List<Widget> _pages = [
     Home(),
-    Home(),
-    Home(),
+    Shop(),
+    Support(),
     Profile(),
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _currentIndex = widget.pageIndex;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

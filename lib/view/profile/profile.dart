@@ -8,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skin_care_traker/controller/auth_controller.dart';
 import 'package:skin_care_traker/utilitys/app_color.dart';
 import 'package:skin_care_traker/widget/app_input.dart';
 import 'package:skin_care_traker/widget/app_network_image.dart';
@@ -196,7 +196,7 @@ class _ProfileState extends State<Profile> {
 
                 SizedBox(height: 30,),
                 InkWell(
-                  // onTap:()=>_changeInfo(),
+                  onTap:()=>_changeInfo(),
                   child: Container(
                     width: 120,
                     height: 40,
@@ -222,28 +222,6 @@ class _ProfileState extends State<Profile> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppInput(
-                  title: "Old Password",
-                  hintText: "Old Password",
-                  controller: oldPass,
-                  obscureText: _passwordVisible,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      // Based on passwordVisible state choose the icon
-                      _passwordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: AppColor.mainColor,
-                    ),
-                    onPressed: () {
-                      // Update the state i.e. toogle the state of passwordVisible variable
-                      setState(() {
-                        _passwordVisible = !_passwordVisible;
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(height: 20,),
                 AppInput(
                   title: "New Password",
                   hintText: "New Password",
@@ -289,7 +267,7 @@ class _ProfileState extends State<Profile> {
                 ),
                 SizedBox(height: 30,),
                 InkWell(
-                  //onTap: ()=>_changePassword(),
+                  onTap: ()=>_changePassword(),
                   child: Container(
                     width: 120,
                     height: 40,
@@ -308,7 +286,7 @@ class _ProfileState extends State<Profile> {
             Row(
               children: [
                 InkWell(
-                  onTap: ()=>Get.to(Login()),
+                  onTap: ()=>_logout(),
                   child: Container(
                     width: 120,
                     height: 40,
@@ -326,7 +304,7 @@ class _ProfileState extends State<Profile> {
                       title: "Delete account",
                       content: Text("Are you sure? Do you want to delete account?"),
                       cancel: TextButton(onPressed: ()=>Get.back(), child: Text("No")),
-                      confirm: TextButton(onPressed: (){}, child: Text("Yes")),
+                      confirm: TextButton(onPressed: ()=>AuthController.deleteAccount(context), child: Text("Yes")),
                     );
                   },
                   child: Container(
@@ -353,49 +331,34 @@ class _ProfileState extends State<Profile> {
 
   //change info
   bool isChangeInfo = false;
-  // void _changeInfo() async{
-  //   setState(() =>isLoading = true);
-  //   var res = await UserController.editUserInfo(fname: fName.text, lname: lname.text);
-  //   if(res.statusCode == 200){
-  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-  //       content: Text("Profile Info Update Success."),
-  //       backgroundColor: Colors.green,
-  //       duration: Duration(milliseconds: 3000),
-  //     ));
-  //     getUserInfoAndStore();
-  //     setState(() {
-  //
-  //     });
-  //   }else{
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       content: Text("Something went wrong."),
-  //       backgroundColor: Colors.red,
-  //       duration: Duration(milliseconds: 3000),
-  //     ));
-  //   }
-  //   setState(() =>isLoading = true);
-  // }
-  // void _deletingAccount() async{
-  //   setState(() =>isLoading = true);
-  //   var res = await UserController.deleteUser();
-  //   if(res.statusCode == 200){
-  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-  //       content: Text("Your account permanently deleted."),
-  //       backgroundColor: Colors.green,
-  //       duration: Duration(milliseconds: 3000),
-  //     ));
-  //     AuthController.logout();
-  //     setState(() {
-  //     });
-  //   }else{
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       content: Text("Something went wrong."),
-  //       backgroundColor: Colors.red,
-  //       duration: Duration(milliseconds: 3000),
-  //     ));
-  //   }
-  //   setState(() =>isLoading = true);
-  // }
+  void _changeInfo() async{
+    setState(() =>isLoading = true);
+    try{
+      User? user = _auth.currentUser;
+      // Update the profile image URL in Firestore
+      await _firestore.collection('users').doc(user?.uid).update({
+        'full_name': fullName.text,
+        "gender" : selectedValue!
+      });
+
+      // Refresh the user data
+      await _getUserData();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Profile information is uploaded success."),
+        backgroundColor: Colors.green,
+        duration: Duration(milliseconds: 3000),
+      ));
+    }catch(e){
+      print("profile error $e");
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Something went wrong.. Try again."),
+        backgroundColor: Colors.red,
+        duration: Duration(milliseconds: 3000),
+      ));
+    }
+
+    setState(() =>isLoading = false);
+  }
 
   _chooseImage() {
     showModalBottomSheet(
@@ -413,7 +376,7 @@ class _ProfileState extends State<Profile> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text("Choose Image",
+                const Text("Choose Image",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -428,7 +391,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     child: Icon(Icons.camera_alt, color: Colors.white,),
                   ),
-                  title: new Text('Camera'),
+                  title: Text('Camera'),
                   onTap: () {
                     _takenImage(ImageSource.camera);
                     Navigator.pop(context);
@@ -510,29 +473,48 @@ class _ProfileState extends State<Profile> {
     setState(() =>isLoading = false);
   }
 
-  // void _changePassword() async{
-  //   setState(() =>isLoading = true);
-  //   print(" ====== ${oldPass.text}");
-  //   print(" ====== ${newPass.text}");
-  //   print(" ====== ${confirmNewPass.text}");
-  //
-  //   var res = await UserController.changePassword(oldPass: oldPass.text, newPass: newPass.text, confirmNewPass: confirmNewPass.text);
-  //   print(" ====== ${jsonDecode(res.body)}");
-  //   if(res.statusCode == 200){
-  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-  //       content: Text("Password changed success."),
-  //       backgroundColor: Colors.green,
-  //       duration: Duration(milliseconds: 3000),
-  //     ));
-  //     AuthController.logout();
-  //   }else{
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       content: Text("${jsonDecode(res.body)["message"]}"),
-  //       backgroundColor: Colors.red,
-  //       duration: Duration(milliseconds: 3000),
-  //     ));
-  //   }
-  //   setState(() =>isLoading = false);
-  // }
+  void _changePassword() async{
+    setState(() =>isLoading = true);
+    if(newPass.text == confirmNewPass.text){
+      try{
+        User? user = _auth.currentUser;
+        // Update the profile image URL in Firestore
+        // After successful sign-in, update the password
+        await user!.updatePassword(newPass.text);
+
+        // Refresh the user data
+        await _getUserData();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Password Changed success."),
+          backgroundColor: Colors.green,
+          duration: Duration(milliseconds: 3000),
+        ));
+      }catch(e){
+        print("profile error $e");
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Something went wrong.. Try again."),
+          backgroundColor: Colors.red,
+          duration: Duration(milliseconds: 3000),
+        ));
+      }
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Confirm password is not match."),
+        backgroundColor: Colors.red,
+        duration: Duration(milliseconds: 3000),
+      ));
+    }
+
+    setState(() =>isLoading = false);
+  }
+
+  void _logout() {
+    Get.defaultDialog(
+      title: "Logout",
+      content: Text("Do you want to logout?"),
+      cancel: TextButton(onPressed: ()=>Get.back(), child: Text("NO")),
+      confirm: TextButton(onPressed: ()=>AuthController.signOut(context), child: Text("Yes")),
+    );
+  } 
 
 }

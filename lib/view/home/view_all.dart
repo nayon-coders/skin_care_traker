@@ -5,7 +5,9 @@ import 'package:skin_care_traker/widget/app_network_image.dart';
 import 'package:skin_care_traker/widget/app_topbar.dart';
 
 class ViewAllUploadImages extends StatefulWidget {
-  const ViewAllUploadImages({Key? key}) : super(key: key);
+  final List<dynamic> taskData;
+
+  const ViewAllUploadImages({Key? key, required this.taskData}) : super(key: key);
 
   @override
   State<ViewAllUploadImages> createState() => _ViewAllUploadImagesState();
@@ -13,20 +15,42 @@ class ViewAllUploadImages extends StatefulWidget {
 
 class _ViewAllUploadImagesState extends State<ViewAllUploadImages> {
   bool isOpenView = false;
+
+  String existingImage = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.bg,
-      body: Column(
-        children: [
-          AppTopBar(),
-          isOpenView
-              ? Expanded(
+      appBar: AppBar(
+        backgroundColor: AppColor.bg,
+        title: Text("Challenges",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black
+          ),
+        ),
+        leading: IconButton(
+          onPressed: (){
+            if(isOpenView){
+              setState(() {
+                isOpenView = false;
+              });
+            }else{
+              Navigator.pop(context);
+            }
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.black,),
+        ),
+      ),
+      body: isOpenView
+          ? Padding(
+            padding: const EdgeInsets.all(15.0),
             child: Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: const AppNetworkImage( boxFit: BoxFit.cover, height: double.infinity, weight: double.infinity, src: "https://i.redd.it/lfpgqc2zcu371.jpg",),
+                  child:  AppNetworkImage( src: existingImage!, boxFit: BoxFit.cover, height: double.infinity, weight: double.infinity, ),
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
@@ -34,6 +58,7 @@ class _ViewAllUploadImagesState extends State<ViewAllUploadImages> {
                     onTap: (){
                       setState(() {
                         isOpenView = false;
+                        existingImage = "";
                       });
                     },
                     child: Container(
@@ -41,8 +66,8 @@ class _ViewAllUploadImagesState extends State<ViewAllUploadImages> {
                       width: 80,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColor.mainColor,
-                        borderRadius: BorderRadius.circular(100)
+                          color: AppColor.mainColor,
+                          borderRadius: BorderRadius.circular(100)
                       ),
                       child: Center(child: Text("Close", style: TextStyle(fontSize: 12, color: Colors.white),),),
                     ),
@@ -51,49 +76,50 @@ class _ViewAllUploadImagesState extends State<ViewAllUploadImages> {
               ],
             ),
           )
-              : Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
-              child: GridView.builder(
-                //physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 5.0,
-                  mainAxisSpacing: 5.0,
-                ),
-                itemCount: 90,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: (){
+          : Padding(
+            padding: const EdgeInsets.only(left: 20.0, top: 20, right: 20, bottom: 10),
+            child: GridView.builder(
+              //physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: 5.0,
+                mainAxisSpacing: 5.0,
+              ),
+              itemCount: widget.taskData.length,
+              itemBuilder: (context, index) {
+                var data = widget.taskData[index];
+                return InkWell(
+                  onTap: (){
+                    if(data["image"] != "null"){
                       setState(() {
                         isOpenView = true;
+                        existingImage = data["image"];
                       });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
+                    }
+
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(5)
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                              height:50, width: 50,
-                              child: AppNetworkImage(src: "https://i.redd.it/lfpgqc2zcu371.jpg")),
-                         SizedBox(height: 10,),
-                          Text("Dec 12, 2023"),
-                        ],
-                      ),
                     ),
-                  );
-                },
-              ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            height:50, width: 50,
+                            child: data["image"] != "null" ? AppNetworkImage(src: "${data["image"]}") : Container(color: Colors.grey,)),
+                        SizedBox(height: 10,),
+                        Text("${data["date"]}"),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        ],
-      )
     );
   }
 }

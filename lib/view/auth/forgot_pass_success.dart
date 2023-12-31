@@ -1,32 +1,18 @@
-import 'dart:convert';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
-import 'package:otp/otp.dart';
-import 'package:skin_care_traker/controller/auth_controller.dart';
-import 'package:skin_care_traker/routing/routing.dart';
 import 'package:skin_care_traker/utilitys/app_color.dart';
-import 'package:skin_care_traker/view/auth/otp.dart';
-import 'package:skin_care_traker/view/auth/signup.dart';
+import 'package:skin_care_traker/view/auth/login.dart';
 import 'package:skin_care_traker/widget/app_button.dart';
-import 'package:skin_care_traker/widget/app_input.dart';
 
-class ForgetPassword extends StatefulWidget {
-  const ForgetPassword({Key? key}) : super(key: key);
+
+class ForgotPasswordSuccess extends StatefulWidget {
+  final String email;
+  const ForgotPasswordSuccess({Key? key, required this.email}) : super(key: key);
 
   @override
-  State<ForgetPassword> createState() => _ForgetPasswordState();
+  State<ForgotPasswordSuccess> createState() => _ForgotPasswordSuccessState();
 }
 
-class _ForgetPasswordState extends State<ForgetPassword> {
-  final email = TextEditingController();
-
-  @override
-  void initState() {
-  }
-
+class _ForgotPasswordSuccessState extends State<ForgotPasswordSuccess> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,29 +36,27 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   ),
                 ),
                 SizedBox(height: 10,),
-                const Text("Enter your email to recovery password.",
+                const Text("We send a password rest link to your mail. Please check you email.",
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 15
                   ),
                 ),
-                SizedBox(height: 50,),
-                AppInput(
-                  title: "Email",
-                  hintText: "Enter your email",
-                  controller: email,
+                SizedBox(height: 20,),
+                 Text("Email: ${widget.email}",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18
+                  ),
                 ),
-                SizedBox(height: 30,),
+
+                SizedBox(height: 50,),
                 Container(
                   margin: EdgeInsets.only(left: 40, right: 40),
                   child: AppButton(
-                    text: "Submit",
-                    isLoading: isLoading,
-                    onClick: ()async{
-                      setState(() => isLoading = true);
-                      await AuthController.resetPassword(email: email.text, context: context);
-                      setState(() => isLoading = false);
-                    },
+                    text: "Login",
+                    isLoading: false,
+                    onClick: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Login()), (route) => false)
                   ),
                 ),
 
@@ -105,25 +89,4 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       ),
     );
   }
-
-  bool isLoading = false;
-// void _login() async{
-//   setState(() => isLoading = true);
-//   var res = await AuthController.login(email: email.text, password: password.text, device_token: deviceTokenToSendPushNotification);
-//   if(res.statusCode == 200){
-//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//       content: Text("Login Success."),
-//       backgroundColor: Colors.green,
-//       duration: Duration(milliseconds: 3000),
-//     ));
-//     Get.offAll(AppBottomNavigation());
-//   }else{
-//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//       content: Text("${jsonDecode(res.body)["message"]}"),
-//       backgroundColor: Colors.red,
-//       duration: Duration(milliseconds: 3000),
-//     ));
-//   }
-//   setState(() => isLoading = false);
-// }
 }
