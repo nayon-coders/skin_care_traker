@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skin_care_traker/app_config.dart';
@@ -23,12 +24,16 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   var currentDate = AppConfig.dateFormat(date: DateTime.now());
+  //get user profile
+  bool isLoading = false;
+
+
+
 
 
   Map<String, dynamic>? startData;
   List<dynamic> taskData = [];
   List<dynamic> lastSevDays = [];
-  bool isLoading = false;
   bool isTodayDone = false;
   int totalDays = 1;
 
