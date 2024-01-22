@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:skin_care_traker/controller/auth_controller.dart';
 import 'package:skin_care_traker/routing/routing.dart';
 import 'package:skin_care_traker/utilitys/app_color.dart';
+import 'package:skin_care_traker/view/admin/dashboard/admin_dashboard.dart';
 import 'package:skin_care_traker/view/app_bottom_menu/app_bottom_menu.dart';
 import 'package:skin_care_traker/view/auth/forget_pass.dart';
 import 'package:skin_care_traker/view/auth/signup.dart';
@@ -174,7 +175,8 @@ class _LoginState extends State<Login> {
         backgroundColor: Colors.green,
         duration: Duration(milliseconds: 3000),
       ));
-      Get.offAll(AppBottomMenu());
+      Get.offAll(AdminDashboard());
+      //Get.offAll(AppBottomMenu());
     }else{
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Email or password is invalid."),

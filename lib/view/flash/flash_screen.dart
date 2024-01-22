@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skin_care_traker/utilitys/app_color.dart';
+import 'package:skin_care_traker/view/admin/dashboard/admin_dashboard.dart';
 import 'package:skin_care_traker/view/app_bottom_menu/app_bottom_menu.dart';
 import 'package:skin_care_traker/view/auth/login.dart';
 
@@ -24,7 +25,8 @@ class _FlashScreenState extends State<FlashScreen> {
     Future.delayed(Duration(seconds: 1), () {
       // 5s over, navigate to a new page
       if(user_id != null){
-        Get.offAll(AppBottomMenu());
+        Get.offAll(AdminDashboard());
+        //Get.offAll(AppBottomMenu());
       }else{
         Get.offAll(Login());
       }
